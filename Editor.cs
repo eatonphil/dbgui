@@ -7,19 +7,24 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using SkiaSharp;
 using SkiaSharp.HarfBuzz;
 
-namespace Eddy {
+namespace DBGUI {
     class Cursor {
 	public int X, Y = 0;
     }
 
     class Editor {
-	List<StringBuilder> lines = new List<StringBuilder>{new StringBuilder("안영")};
+	List<StringBuilder> lines = new List<StringBuilder>{new StringBuilder("")};
 	Cursor cursor = new Cursor();
 	int textSize = 60;
 	SKColor textColor = SKColors.Black;
 	SKColor backgroundColor = SKColors.White;
+	SKPaint cursorPaint = new SKPaint{
+	    Style = SKPaintStyle.Fill,
+	    Color = SKColors.Blue,
+	};
 	DateTime lastBlinkTime = DateTime.Now;
 	bool blink = true;
+	public SKRect Frame { get; set; }
 
 	public void OnTextInput(String text) {
 	    var line = lines[cursor.Y];
@@ -72,6 +77,11 @@ namespace Eddy {
 	}
 	
 	public void Draw(SKCanvas canvas) {
+	    canvas.Save();
+	   
+	    canvas.Translate(Frame.Left, Frame.Top);
+	    canvas.ClipRect(new SKRect(0, 0, Frame.Width, Frame.Height));
+	    
             canvas.DrawColor(backgroundColor, SKBlendMode.Src);
 
             var textPaint = new SKPaint();
@@ -111,13 +121,11 @@ namespace Eddy {
 		    new SkiaSharp.SKPoint(x, y),
 		    new SkiaSharp.SKSize(10, textSize + 10)
 		);
-		var cursorPaint = new SKPaint{
-		    Style = SKPaintStyle.Fill,
-		    Color = SKColors.Blue,
-		};
-
+	     
 		canvas.DrawRect(cursorRect, cursorPaint);
 	    }
+
+	    canvas.Restore();
 	}
     }
 }

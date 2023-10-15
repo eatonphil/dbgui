@@ -7,18 +7,20 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 using SkiaSharp;
 
-namespace Eddy
+namespace DBGUI
 {
-    class EddyWindow : GameWindow
+    class DBGUIWindow : GameWindow
     {
         GRContext? skiaCtx = null;
         SKSurface? skSurface = null;
 	int WindowWidth = 1280, WindowHeight = 720;
 	Editor editor;
+	Table table;
 
-        EddyWindow(Editor editor) : base(GetDefaultDWS(), GetDefaultNWS())
+        DBGUIWindow(Editor editor, Table table) : base(GetDefaultDWS(), GetDefaultNWS())
         {
 	    this.editor = editor;
+	    this.table = table;
         }
 
         static NativeWindowSettings GetDefaultNWS()
@@ -27,7 +29,7 @@ namespace Eddy
             {
                 WindowBorder = WindowBorder.Resizable,
                 WindowState = WindowState.Normal,
-                Title = "SkiaSharp Game Window"
+                Title = "GBGUI",
             };
 
             if (Monitors.GetMonitors().Count > 0)
@@ -103,14 +105,16 @@ namespace Eddy
 	    var canvas = skSurface?.Canvas;
 	    if (canvas != null) {
 		editor.Draw(canvas);
+		table.Draw(canvas);
 		skiaCtx?.Flush();
 	    }
         }
 
         static void Main(string[] args)
         {
-	    var editor = new Editor();
-            using (var prg = new EddyWindow(editor))
+	    var editor = new Editor { Frame = new SKRect(0, 0, WindowWidth, 400) };
+	    var table = new Table { Frame = new SKRect(0, 400, WindowWidth, WindowHeight) };
+            using (var prg = new GBGUIWindow(editor, table))
             {
                     prg.Run();
             }
